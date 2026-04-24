@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mitch Hedberg Joke Machine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #f5d87a;
+      --gold-dim: rgba(245, 216, 122, 0.35);
+      --gold-faint: rgba(245, 216, 122, 0.08);
+      --cream: #e8d5a3;
+      --bg: #080705;
+      --card-bg: rgba(255,255,255,0.03);
+      --border: rgba(245, 216, 122, 0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .spotlight {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 500px;
+      background: radial-gradient(ellipse at top, rgba(255,210,80,0.09) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .stage-lines {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(to right, transparent, rgba(245,216,122,0.25) 30%, rgba(245,216,122,0.25) 70%, transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .hero {
+      padding: 72px 0 56px;
+      text-align: center;
+    }
+
+    .mic-wrap { margin-bottom: 20px; }
+
+    .mic {
+      font-size: 44px;
+      display: inline-block;
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(255,200,60,0.55));
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+
+    h1 {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(38px, 9vw, 72px);
+      color: var(--gold);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      text-shadow: 0 0 40px rgba(255,210,60,0.35), 0 0 100px rgba(255,180,30,0.12);
+    }
+
+    .subtitle-line {
+      font-family: 'Special Elite', cursive;
+      font-size: clamp(16px, 4vw, 26px);
+      color: rgba(245,216,122,0.5);
+      margin-top: 6px;
+    }
+
+    .tagline {
+      margin-top: 18px;
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(232,213,163,0.3);
+    }
+
+    .hero-divider {
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+      margin: 28px auto 0;
+    }
+
+    .gen-label {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(232,213,163,0.4);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .topic-input {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 15px 20px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 16px;
+      color: #f0dfa0;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .topic-input::placeholder {
+      color: rgba(232,213,163,0.2);
+      font-style: italic;
+    }
+
+    .topic-input:focus {
+      border-color: rgba(245,216,122,0.4);
+      box-shadow: 0 0 24px rgba(245,216,122,0.05);
+    }
+
+    .go-btn {
+      background: rgba(245,216,122,0.1);
+      border: 1px solid rgba(245,216,122,0.4);
+      border-radius: 3px;
+      padding: 15px 26px;
+      font-family: 'Special Elite', cursive;
+      font-size: 17px;
+      color: var(--gold);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+
+    .go-btn:hover:not(:disabled) {
+      background: rgba(245,216,122,0.18);
+      box-shadow: 0 0 24px rgba(245,216,122,0.1);
+    }
+
+    .go-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .chip {
+      background: transparent;
+      border: 1px solid rgba(232,213,163,0.13);
+      border-radius: 20px;
+      padding: 6px 15px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 12px;
+      color: rgba(232,213,163,0.35);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .chip:hover {
+      border-color: rgba(245,216,122,0.4);
+      color: rgba(245,216,122,0.75);
+    }
+
+    .jokes-section { min-height: 80px; }
+
+    .loading-state {
+      text-align: center;
+      padding: 52px 0;
+    }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      background: var(--gold-dim);
+      border-radius: 50%;
+      animation: pulse 1.4s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0.5); opacity: 0.2; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .loading-text {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(232,213,163,0.3);
+    }
+
+    .joke-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 2px solid rgba(245,216,122,0.45);
+      border-radius: 0 4px 4px 0;
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      animation: riseUp 0.45s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .joke-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(245,216,122,0.03), transparent 60%);
+      pointer-events: none;
+    }
+
+    .joke-card:nth-child(2) { animation-delay: 0.12s; }
+    .joke-card:nth-child(3) { animation-delay: 0.24s; }
+
+    @keyframes riseUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .joke-num {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(245,216,122,0.3);
+      margin-bottom: 12px;
+    }
+
+    .joke-text {
+      font-size: 17px;
+      line-height: 1.75;
+      color: #eedfa5;
+      font-style: italic;
+    }
+
+    .joke-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: rgba(232,213,163,0.2);
+      text-transform: uppercase;
+    }
+
+    .error-box {
+      background: rgba(255,80,80,0.05);
+      border: 1px solid rgba(255,100,100,0.2);
+      border-radius: 4px;
+      padding: 18px 24px;
+      color: rgba(255,150,150,0.65);
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .about {
+      margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+
+    .about-title {
+      font-family: 'Special Elite', cursive;
+      font-size: 22px;
+      color: rgba(245,216,122,0.6);
+      margin-bottom: 20px;
+    }
+
+    .about-text {
+      font-size: 14px;
+      line-height: 1.9;
+      color: rgba(232,213,163,0.4);
+    }
+
+    .about-text p { margin-bottom: 14px; }
+    .about-text em { color: rgba(232,213,163,0.6); font-style: normal; }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(232,213,163,0.18);
+      line-height: 2;
+    }
+
+    @media (max-width: 480px) {
+      .input-row { flex-direction: column; }
+      .go-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="spotlight"></div>
+<div class="stage-lines"></div>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="mic-wrap"><span class="mic">🎤</span></div>
+    <h1>Mitch Hedberg</h1>
+    <div class="subtitle-line">Joke Machine</div>
+    <p class="tagline">His spirit &nbsp;·&nbsp; New material &nbsp;·&nbsp; Powered by AI</p>
+    <div class="hero-divider"></div>
+  </header>
+
+  <main>
+
+    <div>
+      <label class="gen-label" for="topicInput">Give me a topic, man</label>
+      <div class="input-row">
+        <input
+          class="topic-input"
+          type="text"
+          id="topicInput"
+          placeholder="e.g. escalators, pigeons, wifi..."
+          maxlength="60"
+        />
+        <button class="go-btn" id="goBtn" onclick="generate()">Tell it</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="jokes-section" id="jokesSection"></div>
+
+    <section class="about">
+      <div class="about-title">About this project</div>
+      <div class="about-text">
+        <p>Mitch Hedberg (1968–2005) was one of the greatest one-liner comedians who ever lived. His jokes were short, strange, deadpan, and deeply human — and somehow they never got old.</p>
+        <p>This site uses AI trained on his style to write <em>new</em> jokes he never told, about the world he never got to see. DoorDash. AirPods. Self-checkout. He would have had thoughts.</p>
+        <p>It's a tribute. A what-if. An experiment in style, not a replacement for the real thing.</p>
+        <p><em>"I used to do drugs. I still do, but I used to, too."</em> &mdash; Mitch Hedberg</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-text">
+      In memory of Mitch Hedberg &nbsp;·&nbsp; 1968–2005<br/>
+      R.I.P. man
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  const SUGGESTIONS = [
+    "escalators", "hotel rooms", "DoorDash", "AirPods", "pigeons",
+    "self-checkout", "email", "vending machines", "elevators", "WiFi",
+    "Uber", "TikTok", "streaming services", "passwords", "QR codes"
+  ];
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const chipWrap = document.getElementById('chips');
+    SUGGESTIONS.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = 'chip';
+      btn.textContent = s;
+      btn.onclick = () => quickGenerate(s);
+      chipWrap.appendChild(btn);
+    });
+
+    document.getElementById('topicInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') generate();
+    });
+  });
+
+  function quickGenerate(topic) {
+    document.getElementById('topicInput').value = topic;
+    generate();
+  }
+
+  async function generate() {
+    const topic = document.getElementById('topicInput').value.trim();
+    if (!topic) return;
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/jokes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || `Error ${res.status}`);
+      }
+
+      const data = await res.json();
+      renderJokes(data.jokes, topic);
+
+    } catch (e) {
+      showError(e.message || 'Something went wrong. Try again, man.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('goBtn');
+    const section = document.getElementById('jokesSection');
+    btn.disabled = on;
+    btn.textContent = on ? '...' : 'Tell it';
+    if (on) {
+      section.innerHTML = `
+        <div class="loading-state">
+          <div class="dots">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <div class="loading-text">writing jokes...</div>
+        </div>`;
+    }
+  }
+
+  function renderJokes(jokes, topic) {
+    const section = document.getElementById('jokesSection');
+    if (!jokes || !jokes.length) { showError("Couldn't get jokes. Try again."); return; }
+    section.innerHTML = jokes.map((joke, i) => `
+      <div class="joke-card">
+        <div class="joke-num">joke ${i + 1}</div>
+        <div class="joke-text">${escHtml(joke)}</div>
+        <div class="joke-tag">#${escHtml(topic)}</div>
+      </div>
+    `).join('');
+  }
+
+  function showError(msg) {
+    document.getElementById('jokesSection').innerHTML = `<div class="error-box">${escHtml(msg)}</div>`;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>
