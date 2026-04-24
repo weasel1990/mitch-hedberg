@@ -33,7 +33,7 @@ Return ONLY 3 jokes, numbered 1-3. No intro, no explanation, no commentary. Just
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: `Write 3 Mitch Hedberg-style jokes about: ${topic}` }]
